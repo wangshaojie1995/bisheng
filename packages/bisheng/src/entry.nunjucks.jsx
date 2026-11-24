@@ -3,9 +3,8 @@ require('nprogress-for-antd/nprogress.css');
 
 /* eslint-disable no-unused-vars */
 const React = require('react');
-/* eslint-enable no-unused-vars */
-const ReactDOM = require('react-dom');
-const ReactRouter = require('react-router');
+const { render } = require('rc-util/lib/React/render');
+const ReactRouter = require('react-router-3-fork');
 const history = require('history');
 const data = require('../lib/utils/data.js');
 const createElement = require('../lib/utils/create-element');
@@ -22,8 +21,6 @@ ReactRouter.match({ routes, location, basename }, () => {
       createElement={createElement}
     />
   );
-  ReactDOM.render(
-    router,
-    document.getElementById('react-content'),
-  );
+
+  render(router, document.getElementById('react-content'));
 });

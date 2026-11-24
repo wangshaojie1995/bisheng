@@ -99,6 +99,39 @@ module.exports = function transformer(code, babelConfig = {}, noreact) {
         renderReturn = types.returnStatement(callPathNode.arguments[0]);
 
         callPath.remove();
+      } else if (
+        callPathNode.callee
+        && callPathNode.callee.object
+        && callPathNode.callee.object.name === 'Object'
+        && callPathNode.callee.property
+        && callPathNode.callee.property.name === 'defineProperty'
+        && callPathNode.arguments[0].name === 'exports'
+      ) {
+        callPath.remove();
+      }
+    },
+    AssignmentExpression(path) {
+      const pathNode = path.node;
+      if (
+        pathNode.operator === '='
+        && pathNode.left
+        && pathNode.left.object
+        && pathNode.left.object.name === 'exports'
+        && pathNode.left.property
+        && pathNode.left.property.value === 'default'
+        && pathNode.right.type === 'Identifier'
+      ) {
+        renderReturn = types.returnStatement(
+          types.addComment(
+            types.callExpression(
+              types.memberExpression(types.identifier('React'), types.identifier('createElement')),
+              [types.identifier(pathNode.right.name)],
+            ),
+            'leading',
+            '#__PURE__',
+          ),
+        );
+        path.remove();
       }
     },
   });
